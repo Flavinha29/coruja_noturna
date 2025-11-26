@@ -1,13 +1,15 @@
 import pygame
+import math
 
 class Texto:
-    def __init__(self, tela, texto, x, y, cor, tamanho=30):
+    def __init__(self, tela, texto, x, y, cor, tamanho=30, centralizado=False):
         self.tela = tela
         self.texto = texto
         self.x = x
         self.y = y
         self.cor = cor
         self.tamanho = tamanho
+        self.centralizado = centralizado
         self.fonte = pygame.font.SysFont('Arial', self.tamanho, bold=True)
         self.atualizar_texto(texto)
     
@@ -16,19 +18,41 @@ class Texto:
         self.superficie = self.fonte.render(self.texto, True, self.cor)
     
     def desenhar(self):
-        self.tela.blit(self.superficie, (self.x, self.y))
+        if self.centralizado:
+            rect = self.superficie.get_rect(center=(self.x, self.y))
+            self.tela.blit(self.superficie, rect)
+        else:
+            self.tela.blit(self.superficie, (self.x, self.y))
 
 class Botao:
-    def __init__(self, tela, texto, x, y, largura, altura, cor_fundo, cor_texto):
+    def __init__(self, tela, texto, x, y, largura, altura, cor_fundo, cor_texto, centralizado=False):
         self.tela = tela
-        self.texto = Texto(tela, texto, x + 10, y + 10, cor_texto, 24)
-        self.rect = pygame.Rect(x, y, largura, altura)
+        self.largura = largura
+        self.altura = altura
+        
+        if centralizado:
+            self.x = x - largura // 2
+            self.y = y - altura // 2
+        else:
+            self.x = x
+            self.y = y
+            
+        self.texto = Texto(tela, texto, self.x + largura//2, self.y + altura//2, cor_texto, 24, centralizado=True)
+        self.rect = pygame.Rect(self.x, self.y, largura, altura)
         self.cor_fundo = cor_fundo
         self.cor_texto = cor_texto
+        self.cor_borda = (min(255, cor_fundo[0] + 50), min(255, cor_fundo[1] + 50), min(255, cor_fundo[2] + 50))
     
     def desenhar(self):
-        pygame.draw.rect(self.tela, self.cor_fundo, self.rect)
-        pygame.draw.rect(self.tela, self.cor_texto, self.rect, 2)
+        # Fundo do botão com borda
+        pygame.draw.rect(self.tela, self.cor_fundo, self.rect, border_radius=10)
+        pygame.draw.rect(self.tela, self.cor_borda, self.rect, 3, border_radius=10)
+        
+        # Efeito de hover (opcional)
+        pos = pygame.mouse.get_pos()
+        if self.rect.collidepoint(pos):
+            pygame.draw.rect(self.tela, (255, 255, 255, 50), self.rect, border_radius=10)
+        
         self.texto.desenhar()
     
     def clique(self):

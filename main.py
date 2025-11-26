@@ -1,5 +1,7 @@
 import pygame
 import sys
+import math
+import random
 from scripts.cenas import PartidaCoruja, MenuPrincipal, TelaGameOver
 
 class JogoCoruja:
@@ -19,26 +21,44 @@ class JogoCoruja:
         self.partida = PartidaCoruja(self.tela)
         self.game_over = None
         
-        # Cores do cenário
-        self.cor_ceu = (25, 25, 50)
+        # Cores do cenário - mais bonitas
+        self.cor_ceu = (10, 15, 40)  # Azul mais escuro e profundo
         self.cor_estrelas_fundo = []
         self.inicializar_estrelas_fundo()
     
     def inicializar_estrelas_fundo(self):
-        for _ in range(50):
-            x = pygame.time.get_ticks() % self.LARGURA
-            y = pygame.time.get_ticks() % self.ALTURA
-            brilho = pygame.time.get_ticks() % 155 + 100
-            self.cor_estrelas_fundo.append((x, y, brilho))
+        # Cria mais estrelas para um fundo mais rico
+        for _ in range(100):
+            x = random.randint(0, self.LARGURA)
+            y = random.randint(0, self.ALTURA)
+            tamanho = random.choice([1, 1, 1, 2])  # Algumas estrelas maiores
+            brilho = random.randint(100, 255)
+            velocidade = random.uniform(0.1, 0.5)
+            self.cor_estrelas_fundo.append({
+                'x': x, 'y': y, 'tamanho': tamanho, 
+                'brilho': brilho, 'velocidade': velocidade
+            })
     
     def desenhar_fundo(self):
-        self.tela.fill(self.cor_ceu)
-        tempo = pygame.time.get_ticks() // 500
-        for i, (x, y, brilho_base) in enumerate(self.cor_estrelas_fundo):
-            brilho = brilho_base + (tempo + i) % 56
-            brilho = max(100, min(255, brilho))
+        # Fundo gradiente (simples)
+        for y in range(self.ALTURA):
+            # Gradiente do azul escuro para um pouco mais claro
+            cor = (
+                self.cor_ceu[0] + int(y * 0.05),
+                self.cor_ceu[1] + int(y * 0.05), 
+                self.cor_ceu[2] + int(y * 0.1)
+            )
+            pygame.draw.line(self.tela, cor, (0, y), (self.LARGURA, y))
+        
+        # Estrelas de fundo piscantes
+        tempo = pygame.time.get_ticks() / 1000
+        for estrela in self.cor_estrelas_fundo:
+            brilho = estrela['brilho'] + math.sin(tempo * estrela['velocidade']) * 50
+            brilho = max(50, min(255, brilho))
             cor_estrela = (brilho, brilho, brilho)
-            pygame.draw.circle(self.tela, cor_estrela, (x, y), 1)
+            
+            pygame.draw.circle(self.tela, cor_estrela, 
+                             (estrela['x'], estrela['y']), estrela['tamanho'])
     
     def executar(self):
         executando = True
@@ -58,13 +78,13 @@ class JogoCoruja:
                             self.partida.mover_esquerda()
                         elif evento.key == pygame.K_RIGHT:
                             self.partida.mover_direita()
+                    elif evento.key == pygame.K_ESCAPE:
+                        if self.cena_atual == "jogando":
+                            self.cena_atual = "menu"
                 elif evento.type == pygame.KEYUP:
                     if self.cena_atual == "jogando":
                         if evento.key in [pygame.K_LEFT, pygame.K_RIGHT]:
                             self.partida.parar_movimento()
-                    elif evento.key == pygame.K_ESCAPE:
-                        if self.cena_atual == "jogando":
-                            self.cena_atual = "menu"
             
             # Desenha o fundo
             self.desenhar_fundo()
