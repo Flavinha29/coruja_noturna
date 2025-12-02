@@ -8,6 +8,7 @@ class GerenciadorEstrelas:
         self.estrelas = []
         self.tempo_ultima_estrela = 0
         self.intervalo_estrelas = 60
+        self.prob_estrela_dourada = 0.2  # NOVO: probabilidade ajustável
         
         # Tenta carregar imagens
         self.imagem_estrela = None
@@ -20,7 +21,6 @@ class GerenciadorEstrelas:
                 try:
                     self.imagem_estrela = pygame.image.load(caminho)
                     self.imagem_estrela = pygame.transform.scale(self.imagem_estrela, (30, 30))
-                    print("✅ Estrela normal carregada!")
                     break
                 except:
                     continue
@@ -31,7 +31,6 @@ class GerenciadorEstrelas:
                 try:
                     self.imagem_estrela_dourada = pygame.image.load(caminho)
                     self.imagem_estrela_dourada = pygame.transform.scale(self.imagem_estrela_dourada, (30, 30))
-                    print("✅ Estrela dourada carregada!")
                     break
                 except:
                     continue
@@ -52,13 +51,18 @@ class GerenciadorEstrelas:
     def adicionar_estrela(self):
         x = random.randint(50, self.tela.get_width() - 50)
         y = -20
-        tipo = random.choices(['normal', 'dourada'], weights=[0.8, 0.2])[0]
+        
+        # Usa probabilidade ajustável
+        if random.random() < self.prob_estrela_dourada:
+            tipo = 'dourada'
+        else:
+            tipo = 'normal'
         
         self.estrelas.append({
             'x': x, 'y': y, 'tipo': tipo,
             'rect': pygame.Rect(x, y, 30, 30)
         })
-    
+
     def desenhar(self):
         for estrela in self.estrelas:
             estrela['rect'] = pygame.Rect(estrela['x'], estrela['y'], 30, 30)

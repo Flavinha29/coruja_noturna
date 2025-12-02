@@ -3,6 +3,7 @@ import sys
 import math
 import random
 from scripts.cenas import PartidaCoruja, MenuPrincipal, TelaGameOver
+from scripts.game_manager import GerenciadorProgresso
 
 class JogoCoruja:
     def __init__(self):
@@ -11,27 +12,29 @@ class JogoCoruja:
         # Configurações da tela
         self.LARGURA, self.ALTURA = 600, 500
         self.tela = pygame.display.set_mode((self.LARGURA, self.ALTURA))
-        pygame.display.set_caption("Coruja Noturna Coletora")
+        pygame.display.set_caption("Coruja Noturna Coletora - Com Fases!")
         
         self.relogio = pygame.time.Clock()
         self.cena_atual = "menu"
         
-        # Inicializa cenas
-        self.menu = MenuPrincipal(self.tela)
-        self.partida = PartidaCoruja(self.tela)
+        # Inicializa gerenciador de progresso
+        self.gerenciador = GerenciadorProgresso()
+        
+        # Inicializa cenas - passa o gerenciador
+        self.menu = MenuPrincipal(self.tela, self.gerenciador)
+        self.partida = PartidaCoruja(self.tela, self.gerenciador)
         self.game_over = None
         
         # Cores do cenário - mais bonitas
-        self.cor_ceu = (10, 15, 40)  # Azul mais escuro e profundo
+        self.cor_ceu = (10, 15, 40)
         self.cor_estrelas_fundo = []
         self.inicializar_estrelas_fundo()
     
     def inicializar_estrelas_fundo(self):
-        # Cria mais estrelas para um fundo mais rico
         for _ in range(100):
             x = random.randint(0, self.LARGURA)
             y = random.randint(0, self.ALTURA)
-            tamanho = random.choice([1, 1, 1, 2])  # Algumas estrelas maiores
+            tamanho = random.choice([1, 1, 1, 2])
             brilho = random.randint(100, 255)
             velocidade = random.uniform(0.1, 0.5)
             self.cor_estrelas_fundo.append({
@@ -40,9 +43,7 @@ class JogoCoruja:
             })
     
     def desenhar_fundo(self):
-        # Fundo gradiente (simples)
         for y in range(self.ALTURA):
-            # Gradiente do azul escuro para um pouco mais claro
             cor = (
                 self.cor_ceu[0] + int(y * 0.05),
                 self.cor_ceu[1] + int(y * 0.05), 
@@ -50,7 +51,6 @@ class JogoCoruja:
             )
             pygame.draw.line(self.tela, cor, (0, y), (self.LARGURA, y))
         
-        # Estrelas de fundo piscantes
         tempo = pygame.time.get_ticks() / 1000
         for estrela in self.cor_estrelas_fundo:
             brilho = estrela['brilho'] + math.sin(tempo * estrela['velocidade']) * 50
@@ -97,12 +97,18 @@ class JogoCoruja:
                 self.cena_atual = self.partida.atualizar()
                 
                 if self.cena_atual == "game_over":
-                    self.game_over = TelaGameOver(self.tela, self.partida.pontuacao, self.partida.record)
+                    self.game_over = TelaGameOver(
+                        self.tela, 
+                        self.partida.pontuacao, 
+                        self.gerenciador.recorde_geral,
+                        self.partida.fase_sistema.fase_atual
+                    )
             
             elif self.cena_atual == "game_over":
                 self.cena_atual = self.game_over.atualizar()
                 
                 if self.cena_atual == "jogando":
+                    # O próprio reset() da PartidaCoruja já volta para fase 1
                     self.partida.reset()
             
             pygame.display.flip()

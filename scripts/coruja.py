@@ -5,18 +5,14 @@ class Coruja:
     def __init__(self, tela):
         self.tela = tela
         self.largura, self.altura = 60, 40
-        self.x = tela.get_width() // 2 - self.largura // 2
-        self.y = tela.get_height() // 2
-        self.velocidade_y = 0
+        self.x = tela.get_width() // 2 - self.largura // 2  # Centralizada horizontalmente
+        self.y = tela.get_height() -self.altura - 10 # POSIÇÃO INFERIOR (100 pixels do fundo)
         self.velocidade_x = 0
-        self.gravidade = 0.5
-        self.impulso = -8
         self.velocidade_lateral = 5
         self.rect = pygame.Rect(self.x, self.y, self.largura, self.altura)
         
         # Tenta carregar a imagem da coruja
         try:
-            # Tenta caminhos diferentes
             caminhos_tentados = [
                 os.path.join('assets', 'sprites', 'coruja.png'),
                 'assets/sprites/coruja.png',
@@ -34,16 +30,12 @@ class Coruja:
                 except:
                     continue
             else:
-                # Se nenhum caminho funcionou
                 raise FileNotFoundError("Imagem não encontrada")
                 
         except Exception as e:
             print(f"❌ Erro ao carregar imagem: {e}")
             self.tem_imagem = False
             self.cor_corpo = (200, 160, 60)
-    
-    def pular(self):
-        self.velocidade_y = self.impulso
     
     def mover_esquerda(self):
         self.velocidade_x = -self.velocidade_lateral
@@ -55,17 +47,17 @@ class Coruja:
         self.velocidade_x = 0
     
     def atualizar(self):
-        self.velocidade_y += self.gravidade
-        self.y += self.velocidade_y
+        # Apenas movimento lateral
         self.x += self.velocidade_x
         
-        # Limites
-        if self.y < 0: self.y = 0
-        if self.y > self.tela.get_height() - self.altura: 
-            self.y = self.tela.get_height() - self.altura
-        if self.x < 0: self.x = 0
+        # Limites horizontais
+        if self.x < 0: 
+            self.x = 0
         if self.x > self.tela.get_width() - self.largura: 
             self.x = self.tela.get_width() - self.largura
+        
+        # Posição Y permanece fixa na parte inferior
+        # Não precisa de limites verticais
         
         self.rect = pygame.Rect(self.x, self.y, self.largura, self.altura)
     
