@@ -39,20 +39,18 @@ class PartidaCoruja:
                                20, 100, (200, 255, 200), 24)
         self.texto_objetivo = Texto(tela, f"Objetivo: {self.fase_sistema.config['objetivo']} pontos", 
                                    20, 130, (255, 255, 200), 20)
-        self.texto_controles = Texto(tela, "← → para mover", 20, 450, (150, 150, 150), 18)  # MODIFICADO
+        self.texto_controles = Texto(tela, "← → para mover", 20, 450, (150, 150, 150), 18)
     
-    # ADICIONE ESTES MÉTODOS DE MOVIMENTO (SEM PULAR):
+    # ⬇⬇⬇ ADICIONE APENAS ESTES 3 MÉTODOS ⬇⬇⬇
     def mover_esquerda(self):
-        """Move a coruja para esquerda (seta ←)"""
         self.coruja.mover_esquerda()
     
     def mover_direita(self):
-        """Move a coruja para direita (seta →)"""
         self.coruja.mover_direita()
     
     def parar_movimento(self):
-        """Para o movimento lateral da coruja"""
         self.coruja.parar_movimento()
+    # ⬆⬆⬆ ATÉ AQUI ⬆⬆⬆
     
     def configurar_fase(self):
         """Aplica configurações da fase atual"""
@@ -183,14 +181,12 @@ class MenuPrincipal:
         self.texto_recorde = Texto(tela, f"Recorde: {gerenciador.recorde_geral}", 
                                  self.LARGURA//2, 200, (255, 200, 100), 28, centralizado=True)
         
-        # Botões
+        # ✅ APENAS 2 BOTÕES (SEM "RESETAR FASES")
         self.botao_jogar = Botao(tela, "VOAR", self.LARGURA//2, 280, 200, 60, (100, 150, 255), (255, 255, 255), centralizado=True)
-        self.botao_resetar = Botao(tela, "RESETAR FASES", self.LARGURA//2, 360, 200, 50, (255, 100, 100), (255, 255, 255), centralizado=True)
-        self.botao_sair = Botao(tela, "SAIR", self.LARGURA//2, 420, 200, 50, (150, 150, 150), (255, 255, 255), centralizado=True)
+        self.botao_sair = Botao(tela, "SAIR", self.LARGURA//2, 360, 200, 60, (255, 100, 100), (255, 255, 255), centralizado=True)
         
-        # Instruções atualizadas
         self.instrucoes = Texto(tela, "Use ← → para mover a coruja", 
-                               self.LARGURA//2, 470, (150, 150, 150), 18, centralizado=True)
+                               self.LARGURA//2, 450, (150, 150, 150), 18, centralizado=True)
         
         self.coruja_decorativa = CorujaDecorativa(tela)
     
@@ -199,18 +195,12 @@ class MenuPrincipal:
         self.subtitulo.desenhar()
         self.texto_recorde.desenhar()
         self.botao_jogar.desenhar()
-        self.botao_resetar.desenhar()
         self.botao_sair.desenhar()
         self.instrucoes.desenhar()
         self.coruja_decorativa.desenhar()
         
         if self.botao_jogar.clique():
             self.estado = "jogando"
-        
-        if self.botao_resetar.clique():
-            self.gerenciador.resetar()
-            self.texto_recorde.atualizar_texto(f"Recorde: {self.gerenciador.recorde_geral}")
-            print("🔄 Progresso resetado!")
         
         if self.botao_sair.clique():
             pygame.quit()
@@ -232,9 +222,9 @@ class TelaGameOver:
         self.texto_recorde = Texto(tela, f"Recorde Geral: {self.recorde}", self.LARGURA//2, 190, (255, 255, 100), 28, centralizado=True)
         self.texto_info = Texto(tela, "Próximo voo: Fase 1", self.LARGURA//2, 240, (200, 255, 200), 24, centralizado=True)
         
+        # ✅ APENAS 2 BOTÕES (SEM "MENU")
         self.botao_reiniciar = Botao(tela, "VOAR NOVAMENTE", self.LARGURA//2, 300, 240, 50, (100, 200, 100), (255, 255, 255), centralizado=True)
-        self.botao_menu = Botao(tela, "MENU", self.LARGURA//2, 370, 100, 50, (100, 100, 200), (255, 255, 255), centralizado=True)
-        self.botao_sair = Botao(tela, "SAIR", self.LARGURA//2, 430, 100, 50, (255, 100, 100), (255, 255, 255), centralizado=True)
+        self.botao_sair = Botao(tela, "SAIR", self.LARGURA//2, 370, 100, 50, (255, 100, 100), (255, 255, 255), centralizado=True)
     
     def atualizar(self):
         self.titulo.desenhar()
@@ -242,14 +232,10 @@ class TelaGameOver:
         self.texto_recorde.desenhar()
         self.texto_info.desenhar()
         self.botao_reiniciar.desenhar()
-        self.botao_menu.desenhar()
         self.botao_sair.desenhar()
         
         if self.botao_reiniciar.clique():
             self.estado = "jogando"
-        
-        if self.botao_menu.clique():
-            self.estado = "menu"
         
         if self.botao_sair.clique():
             pygame.quit()

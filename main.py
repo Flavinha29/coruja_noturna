@@ -67,20 +67,18 @@ class JogoCoruja:
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     executando = False
-                elif evento.type == pygame.MOUSEBUTTONDOWN:
-                    if self.cena_atual == "jogando":
-                        self.partida.pular()
+                
                 elif evento.type == pygame.KEYDOWN:
                     if self.cena_atual == "jogando":
-                        if evento.key == pygame.K_SPACE:
-                            self.partida.pular()
-                        elif evento.key == pygame.K_LEFT:
+                        if evento.key == pygame.K_LEFT:
                             self.partida.mover_esquerda()
                         elif evento.key == pygame.K_RIGHT:
                             self.partida.mover_direita()
                     elif evento.key == pygame.K_ESCAPE:
                         if self.cena_atual == "jogando":
                             self.cena_atual = "menu"
+                
+                # ADICIONADO DE VOLTA: evento KEYUP para parar movimento
                 elif evento.type == pygame.KEYUP:
                     if self.cena_atual == "jogando":
                         if evento.key in [pygame.K_LEFT, pygame.K_RIGHT]:
